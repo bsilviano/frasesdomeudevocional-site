@@ -1,10 +1,10 @@
 # Frases do Meu Devocional
 
-Short videos with phrases of faith and hope, published every day on social media (YouTube, Instagram and TikTok).
+Short videos with phrases of faith and hope, published every day on social media (YouTube, Instagram, TikTok and Pinterest).
 
 This is a personal Christian content project in Portuguese, created and maintained by Bruno. Each video is 8 seconds long and combines an inspirational phrase, a background image and the creator's own music.
 
-The project's app posts only the creator's own videos, to the creator's own accounts, using the creator's authorization (TikTok Login Kit and Content Posting API). It does not access data from other users.
+The project's app posts only the creator's own videos, to the creator's own accounts, using the creator's authorization (TikTok Login Kit and Content Posting API). It does not access data from other users. On Pinterest, the videos are published as Pins on the "Frases" board of the @frasesdomeudevocional account, up to 4 times a day.
 
 [Privacy Policy](privacy-en.html)
 
