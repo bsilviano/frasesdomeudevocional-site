@@ -1,3 +1,8 @@
+---
+layout: default
+title: Política de Privacidade
+lang: pt-BR
+---
 # Política de Privacidade
 
 Última atualização: 1 de novembro de 2026.

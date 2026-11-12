@@ -1,3 +1,8 @@
+---
+layout: default
+title: Terms of Use
+lang: en
+---
 # Terms of Use
 
 Last updated: October 23, 2026.

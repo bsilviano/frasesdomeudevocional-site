@@ -1,3 +1,8 @@
+---
+layout: default
+title: Termos de Uso
+lang: pt-BR
+---
 # Termos de Uso
 
 Última atualização: 23 de outubro de 2026.
