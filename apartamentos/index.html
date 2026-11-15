@@ -55,10 +55,11 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return
 function dist(a,b,c,d){var r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 6371000*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function emZona(a){return D.zonas_risco.some(function(z){return dist(a.lat,a.lon,z.lat,z.lon)<=z.raio})}
 function ok(a){return a.status==='ativo'&&!a.risco_auto&&!emZona(a)}
+function lk(a){var u=String(a.url||'');if(/apto\.vc/.test(u))return{b:'Ver empreendimento',w:'Link do empreendimento: abre a página do lançamento com várias unidades, não um anúncio único.'};if(/\/imobiliaria\/|\/busca\/|\/venda\/apartamentos\/|trovit|nestoria|apartamentos-venda-[a-z-]+\.html|\?page=/.test(u))return{b:'Ver lista do anúncio',w:'Link genérico: abre uma lista (imobiliária ou busca). Procure pela rua e pelo preço.'};return{b:'Ver anúncio',w:null}}
 function pop(a){
  var sv='https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+a.lat+','+a.lon;
  var gm='https://www.google.com/maps/search/?api=1&query='+a.lat+','+a.lon;
- return '<b>'+brl(a.preco)+'</b><br>'+esc(a.titulo)+'<br>'+(a.dist_recreio_km!=null?(a.dist_recreio_km<1?'No Recreio':a.dist_recreio_km.toFixed(1).replace('.',',')+' km do Recreio')+'<br>':'')+esc([a.rua,a.bairro,a.cidade].filter(Boolean).join(' · '))+'<br><a href="'+esc(a.url)+'" target="_blank" rel="noopener">Ver anúncio</a><a class="s" href="'+gm+'" target="_blank" rel="noopener">Google Maps</a><a class="s" href="'+sv+'" target="_blank" rel="noopener">Street View</a>';
+ return '<b>'+brl(a.preco)+'</b><br>'+esc(a.titulo)+'<br>'+(a.dist_recreio_km!=null?(a.dist_recreio_km<1?'No Recreio':a.dist_recreio_km.toFixed(1).replace('.',',')+' km do Recreio')+'<br>':'')+esc([a.rua,a.bairro,a.cidade].filter(Boolean).join(' · '))+(lk(a).w?'<br><i style="color:#b02a37">'+lk(a).w+'</i>':'')+'<br><a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+lk(a).b+'</a><a class="s" href="'+gm+'" target="_blank" rel="noopener">Google Maps</a><a class="s" href="'+sv+'" target="_blank" rel="noopener">Street View</a>';
 }
 function pick(id,fly){
  sel=id;
@@ -81,7 +82,7 @@ function draw(fit){
  if(!vis.length)l.innerHTML='<p class="n">Nenhum imóvel com esses filtros.</p>';
  vis.forEach(function(a,i){
   var d=document.createElement('div');d.className='c';d.dataset.id=a.id;
-  d.innerHTML='<b class="p">'+brl(a.preco)+'</b><h3>'+esc(a.titulo)+'</h3><p>'+esc([a.rua,a.bairro,a.cidade].filter(Boolean).join(' · '))+'</p><p>'+(a.dist_recreio_km!=null?(a.dist_recreio_km<1?'No Recreio':a.dist_recreio_km.toFixed(1).replace('.',',')+' km do Recreio'):'')+'</p><p>'+esc([a.area?a.area+' m²':null,a.quartos?a.quartos+' quartos':null,a.vagas?a.vagas+' vaga(s)':null,a.condominio?'Cond. '+brl(a.condominio):null,a.estagio].filter(Boolean).join(' · '))+'</p>'+(a.dist_favela_m!=null?'<p>Favela mais próxima: '+a.dist_favela_m+' m</p>':'')+(a.alerta?'<p class="w">Atenção: '+esc(a.alerta)+'</p>':'')+(a.obs?'<p>'+esc(a.obs)+'</p>':'')+'<p>Fonte: '+esc(a.fonte)+'</p>';
+  d.innerHTML='<b class="p">'+brl(a.preco)+'</b><h3>'+esc(a.titulo)+'</h3><p>'+esc([a.rua,a.bairro,a.cidade].filter(Boolean).join(' · '))+'</p><p>'+(a.dist_recreio_km!=null?(a.dist_recreio_km<1?'No Recreio':a.dist_recreio_km.toFixed(1).replace('.',',')+' km do Recreio'):'')+'</p><p>'+esc([a.area?a.area+' m²':null,a.quartos?a.quartos+' quartos':null,a.vagas?a.vagas+' vaga(s)':null,a.condominio?'Cond. '+brl(a.condominio):null,a.estagio].filter(Boolean).join(' · '))+'</p>'+(a.dist_favela_m!=null?'<p>Favela mais próxima: '+a.dist_favela_m+' m</p>':'')+(lk(a).w?'<p class="w">Atenção: '+lk(a).w+'</p>':'')+(a.alerta?'<p class="w">Atenção: '+esc(a.alerta)+'</p>':'')+(a.obs?'<p>'+esc(a.obs)+'</p>':'')+'<p>Fonte: '+esc(a.fonte)+'</p>';
   d.addEventListener('click',function(){pick(a.id,true)});l.appendChild(d);
  });
  if(fit&&vis.length){map.fitBounds(vis.map(function(a){return[a.lat,a.lon]}),{padding:[40,40],maxZoom:13})}
