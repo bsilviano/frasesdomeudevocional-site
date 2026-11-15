@@ -58,7 +58,7 @@ function ok(a){return a.status==='ativo'&&!a.risco_auto&&!emZona(a)}
 function pop(a){
  var sv='https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+a.lat+','+a.lon;
  var gm='https://www.google.com/maps/search/?api=1&query='+a.lat+','+a.lon;
- return '<b>'+brl(a.preco)+'</b><br>'+esc(a.titulo)+'<br>'+esc([a.rua,a.bairro,a.cidade].filter(Boolean).join(' · '))+'<br><a href="'+esc(a.url)+'" target="_blank" rel="noopener">Ver anúncio</a><a class="s" href="'+gm+'" target="_blank" rel="noopener">Google Maps</a><a class="s" href="'+sv+'" target="_blank" rel="noopener">Street View</a>';
+ return '<b>'+brl(a.preco)+'</b><br>'+esc(a.titulo)+'<br>'+(a.dist_recreio_km!=null?(a.dist_recreio_km<1?'No Recreio':a.dist_recreio_km.toFixed(1).replace('.',',')+' km do Recreio')+'<br>':'')+esc([a.rua,a.bairro,a.cidade].filter(Boolean).join(' · '))+'<br><a href="'+esc(a.url)+'" target="_blank" rel="noopener">Ver anúncio</a><a class="s" href="'+gm+'" target="_blank" rel="noopener">Google Maps</a><a class="s" href="'+sv+'" target="_blank" rel="noopener">Street View</a>';
 }
 function pick(id,fly){
  sel=id;
@@ -69,7 +69,7 @@ function pick(id,fly){
 }
 function draw(fit){
  var fc=document.getElementById('fc').value,fp=Number(document.getElementById('fp').value)||0;
- vis=D.apartamentos.filter(function(a){return ok(a)&&a.lat!=null&&(!fc||a.cidade===fc)&&(!fp||(a.preco!=null&&a.preco<=fp))}).sort(function(x,y){return (x.preco||9e9)-(y.preco||9e9)});
+ vis=D.apartamentos.filter(function(a){return ok(a)&&a.lat!=null&&(!fc||a.cidade===fc)&&(!fp||(a.preco!=null&&a.preco<=fp))}).sort(function(x,y){return ((x.dist_recreio_km==null?999:x.dist_recreio_km)-(y.dist_recreio_km==null?999:y.dist_recreio_km))||((x.preco||9e9)-(y.preco||9e9))});
  layer.clearLayers();markers={};
  vis.forEach(function(a){
   var ic=L.divIcon({className:'',html:'<div class="pin">'+Math.round(a.preco/1000)+' mil</div>',iconSize:[0,0]});
@@ -81,7 +81,7 @@ function draw(fit){
  if(!vis.length)l.innerHTML='<p class="n">Nenhum imóvel com esses filtros.</p>';
  vis.forEach(function(a,i){
   var d=document.createElement('div');d.className='c';d.dataset.id=a.id;
-  d.innerHTML='<b class="p">'+brl(a.preco)+'</b><h3>'+esc(a.titulo)+'</h3><p>'+esc([a.rua,a.bairro,a.cidade].filter(Boolean).join(' · '))+'</p><p>'+esc([a.area?a.area+' m²':null,a.quartos?a.quartos+' quartos':null,a.vagas?a.vagas+' vaga(s)':null,a.condominio?'Cond. '+brl(a.condominio):null,a.estagio].filter(Boolean).join(' · '))+'</p>'+(a.dist_favela_m!=null?'<p>Favela mais próxima: '+a.dist_favela_m+' m</p>':'')+(a.alerta?'<p class="w">Atenção: '+esc(a.alerta)+'</p>':'')+(a.obs?'<p>'+esc(a.obs)+'</p>':'')+'<p>Fonte: '+esc(a.fonte)+'</p>';
+  d.innerHTML='<b class="p">'+brl(a.preco)+'</b><h3>'+esc(a.titulo)+'</h3><p>'+esc([a.rua,a.bairro,a.cidade].filter(Boolean).join(' · '))+'</p><p>'+(a.dist_recreio_km!=null?(a.dist_recreio_km<1?'No Recreio':a.dist_recreio_km.toFixed(1).replace('.',',')+' km do Recreio'):'')+'</p><p>'+esc([a.area?a.area+' m²':null,a.quartos?a.quartos+' quartos':null,a.vagas?a.vagas+' vaga(s)':null,a.condominio?'Cond. '+brl(a.condominio):null,a.estagio].filter(Boolean).join(' · '))+'</p>'+(a.dist_favela_m!=null?'<p>Favela mais próxima: '+a.dist_favela_m+' m</p>':'')+(a.alerta?'<p class="w">Atenção: '+esc(a.alerta)+'</p>':'')+(a.obs?'<p>'+esc(a.obs)+'</p>':'')+'<p>Fonte: '+esc(a.fonte)+'</p>';
   d.addEventListener('click',function(){pick(a.id,true)});l.appendChild(d);
  });
  if(fit&&vis.length){map.fitBounds(vis.map(function(a){return[a.lat,a.lon]}),{padding:[40,40],maxZoom:13})}
