@@ -56,7 +56,9 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return
 function dist(a,b,c,d){var r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 6371000*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function emZona(a){return D.zonas_risco.some(function(z){return dist(a.lat,a.lon,z.lat,z.lon)<=z.raio})}
 var SEMLINK=false;
-function ok(a){return a.status==='ativo'&&!a.risco_auto&&!emZona(a)&&a.preco!=null&&a.preco<=250000&&(SEMLINK||lk(a).w===null||/apto\.vc/.test(String(a.url||'')))}
+function nrm(s){return String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim()}
+function localOff(a){var L=D.locais_reprovados||[],c=nrm(a.cidade),b=nrm(a.bairro),r=nrm(a.rua);for(var i=0;i<L.length;i++){var l=L[i];if(nrm(l.cidade)!==c)continue;if(l.tipo==='cidade')return true;if(nrm(l.bairro)!==b)continue;if(l.tipo==='bairro')return true;if(l.tipo==='rua'&&r&&nrm(l.rua)===r)return true}return false}
+function ok(a){return !localOff(a)&&a.status==='ativo'&&!a.risco_auto&&!emZona(a)&&a.preco!=null&&a.preco<=250000&&(SEMLINK||lk(a).w===null||/apto\.vc/.test(String(a.url||'')))}
 function lk(a){var u=String(a.url||'');if(/apto\.vc/.test(u))return{b:'Ver empreendimento',w:'Link do empreendimento: abre a página do lançamento com várias unidades, não um anúncio único.'};if(/\/imobiliaria\/|\/busca\/|\/venda\/apartamentos\/|trovit|nestoria|apartamentos-venda-[a-z-]+\.html|\?page=/.test(u))return{b:'Ver lista do anúncio',w:'Link genérico: abre uma lista (imobiliária ou busca). Procure pela rua e pelo preço.'};return{b:'Ver anúncio',w:null}}
 function pop(a){
  var sv='https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+a.lat+','+a.lon;
@@ -95,7 +97,7 @@ function init(){
  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
  layer=L.layerGroup().addTo(map);zl=L.layerGroup().addTo(map);fl=L.layerGroup().addTo(map);
  fetch('dados.json?'+Date.now()).then(function(r){return r.json()}).then(function(j){
-  D=j;D.zonas_risco=D.zonas_risco||[];D.favelas=D.favelas||[];
+  D=j;D.zonas_risco=D.zonas_risco||[];D.locais_reprovados=D.locais_reprovados||[];D.favelas=D.favelas||[];
   var cs={};D.apartamentos.forEach(function(a){if(a.cidade)cs[a.cidade]=1});
   var s=document.getElementById('fc');Object.keys(cs).sort().forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;s.appendChild(o)});
   D.favelas.forEach(function(f){L.circle([f.lat,f.lon],{radius:f.raio_m||150,color:'#8a5a00',weight:1,fillColor:'#e0a100',fillOpacity:.25}).bindTooltip('Favela/comunidade: '+(f.nome||'')).addTo(fl)});
