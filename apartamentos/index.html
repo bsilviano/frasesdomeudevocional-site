@@ -41,6 +41,7 @@ header button{background:#2f5597;color:#fff;cursor:pointer}
  <label>Cidade <select id="fc"><option value="">Todas</option></select></label>
  <label>Preço <select id="fp"><option value="">Sem limite</option><option value="200000">até R$ 200 mil</option><option value="250000">até R$ 250 mil</option><option value="280000">até R$ 280 mil</option></select></label>
  <button id="ver">Ver Tudo</button>
+ <button id="sl">Mostrar sem link direto</button>
 </header>
 <div id="wrap">
  <div id="lista"></div>
@@ -54,7 +55,8 @@ function brl(v){return v==null?'—':v.toLocaleString('pt-BR',{style:'currency',
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function dist(a,b,c,d){var r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 6371000*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function emZona(a){return D.zonas_risco.some(function(z){return dist(a.lat,a.lon,z.lat,z.lon)<=z.raio})}
-function ok(a){return a.status==='ativo'&&!a.risco_auto&&!emZona(a)}
+var SEMLINK=false;
+function ok(a){return a.status==='ativo'&&!a.risco_auto&&!emZona(a)&&(SEMLINK||lk(a).w===null)}
 function lk(a){var u=String(a.url||'');if(/apto\.vc/.test(u))return{b:'Ver empreendimento',w:'Link do empreendimento: abre a página do lançamento com várias unidades, não um anúncio único.'};if(/\/imobiliaria\/|\/busca\/|\/venda\/apartamentos\/|trovit|nestoria|apartamentos-venda-[a-z-]+\.html|\?page=/.test(u))return{b:'Ver lista do anúncio',w:'Link genérico: abre uma lista (imobiliária ou busca). Procure pela rua e pelo preço.'};return{b:'Ver anúncio',w:null}}
 function pop(a){
  var sv='https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+a.lat+','+a.lon;
@@ -101,6 +103,7 @@ function init(){
  }).catch(function(){document.getElementById('lista').innerHTML='<p class="n">Não consegui carregar os dados.</p>'});
  document.getElementById('fc').onchange=function(){draw(true)};document.getElementById('fp').onchange=function(){draw(true)};
  document.getElementById('ver').onclick=function(){draw(true)};
+ document.getElementById('sl').onclick=function(){SEMLINK=!SEMLINK;this.textContent=SEMLINK?'Esconder sem link direto':'Mostrar sem link direto';draw(true)};
 }
 init();
 })();
